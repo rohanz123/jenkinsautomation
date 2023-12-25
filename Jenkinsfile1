@@ -1,0 +1,49 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_COMPOSE_VERSION = '1.29.2'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    // Check out your source code from version control
+                    checkout scm
+                }
+            }
+        }
+
+        stage('Build and Test') {
+            steps {
+                script {
+                    // Build and test your application
+                    sh 'docker-compose build'
+                    sh 'docker-compose up -d'
+                    sh 'docker-compose exec your_service_name ./run_tests.sh'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    // Deploy your application
+                    sh 'docker-compose down'
+                    sh 'docker-compose up -d'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'CI/CD Pipeline successfully completed!'
+        }
+
+        failure {
+            echo 'CI/CD Pipeline failed!'
+        }
+    }
+}
